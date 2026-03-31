@@ -3,10 +3,16 @@ QuantVista is an interactive data visualization platform built with Flask and Pl
 
 Key Features
 
-Upload CSV, XLSX/XLS, and JSON data files
-Create interactive charts (bar, line, scatter, heatmap, treemap, etc.)
-Smart Y-axis auto-scaling for near-equal data visibility
-Built-in statistical and categorical data analysis
-Save, load, and delete dashboard presets
-Export charts as PNG, SVG, and standalone HTML
-Mobile-responsive UI with light/dark mode toggle
+Upload CSV, XLSX/XLS, and JSON data files.
+
+Create interactive charts (bar, line, scatter, heatmap, treemap, etc.).
+
+Smart Y-axis auto-scaling for near-equal data visibility.
+
+Built-in statistical and categorical data analysis.
+
+Save, load, and delete dashboard presets.
+
+Export charts as PNG, SVG, and standalone HTML.
+
+Mobile-responsive UI with light/dark mode toggle.
