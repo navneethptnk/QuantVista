@@ -1,18 +1,59 @@
 # QuantVista
-QuantVista is an interactive data visualization platform built with Flask and Plotly. It lets users upload structured datasets, generate multiple chart types, run quick statistical analysis, save reusable dashboard configurations, and export visualizations in PNG/SVG/HTML formats. The app is optimized for desktop and mobile, with light/dark theme support and smart auto-scaling for close-value comparisons.
 
-Key Features
+QuantVista is set up to run on Vercel without changing the app’s core Flask visualization logic.
 
-Upload CSV, XLSX/XLS, and JSON data files.
+## Local development
 
-Create interactive charts (bar, line, scatter, heatmap, treemap, etc.).
+1. Create and activate a virtual environment.
+2. Install dependencies:
 
-Smart Y-axis auto-scaling for near-equal data visibility.
+```powershell
+pip install -r requirements.txt
+```
 
-Built-in statistical and categorical data analysis.
+3. Run the Flask app:
 
-Save, load, and delete dashboard presets.
+```powershell
+python app.py
+```
 
-Export charts as PNG, SVG, and standalone HTML.
+4. Open `http://127.0.0.1:5000`.
 
-Mobile-responsive UI with light/dark mode toggle.
+## Vercel deployment
+
+This repo includes:
+
+- `api/index.py` as the Vercel Python entrypoint
+- `vercel.json` to route requests into the Flask app
+- serverless-friendly storage defaults in `app.py`
+- a static frontend in `docs/` that Vercel serves through the Flask app
+
+### Important note
+
+The visualization and analysis flow is now stateless-capable. The browser can send the uploaded file contents back with each analysis or chart request, which avoids depending on permanent server disk storage in Vercel.
+
+Saved dashboards are stored in browser `localStorage`, so they work on Vercel without needing a database.
+
+### Deploy steps
+
+1. Import the repo into Vercel.
+2. Ensure Vercel detects it as a Python project.
+3. Deploy with the existing `requirements.txt`.
+4. Open the deployed URL and use the app normally.
+
+### Optional environment variable
+
+If you later host the frontend on a different origin, you can allow cross-origin requests with:
+
+```text
+QUANTVISTA_ALLOWED_ORIGINS=https://your-frontend-domain.example
+```
+
+If you do not need cross-origin access, you can skip this.
+
+## Project structure
+
+- `app.py`: main Flask app
+- `api/index.py`: Vercel function entrypoint
+- `docs/`: frontend assets used by the app
+- `docs/config.js`: optional runtime frontend config

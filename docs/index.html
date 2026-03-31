@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuantVista - Data Visualization Dashboard</title>
+    <script>
+        (function() {
+            try {
+                var saved = localStorage.getItem('quantvista-theme');
+                if (saved === 'dark' || saved === 'light') {
+                    document.documentElement.setAttribute('data-theme', saved);
+                }
+            } catch (e) {}
+        })();
+    </script>
+    <link rel="stylesheet" href="./static/css/style.css?v=3.0">
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-content">
+                <label class="theme-switch" for="themeToggle">
+                    <input id="themeToggle" type="checkbox" role="switch" aria-label="Toggle dark mode">
+                    <span class="theme-icon sun" aria-hidden="true">☀</span>
+                    <span class="theme-slider"></span>
+                    <span class="theme-icon moon" aria-hidden="true">🌙</span>
+                </label>
+                <h1 class="title">
+                    <svg class="logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 3v18h18"></path>
+                        <path d="M18 17V9"></path>
+                        <path d="M13 17V5"></path>
+                        <path d="M8 17v-3"></path>
+                    </svg>
+                    QuantVista
+                </h1>
+                <p class="subtitle">Advanced Data Visualization & Analytics Platform</p>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <section class="card upload-section">
+                <h2 class="card-title">Upload Data</h2>
+                <div class="upload-area" id="uploadArea">
+                    <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 8 12 3 7 8"></polyline>
+                        <line x1="12" y1="3" x2="12" y2="15"></line>
+                    </svg>
+                    <p class="upload-text">Click to upload or drag and drop</p>
+                    <p class="upload-hint">CSV, Excel, or JSON files (Max 16MB)</p>
+                    <input type="file" id="fileInput" accept=".csv,.xlsx,.xls,.json" hidden>
+                </div>
+                <div id="fileInfo" class="file-info" style="display: none;">
+                    <div class="info-item">
+                        <span class="info-label">File:</span>
+                        <span id="fileName" class="info-value"></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Rows:</span>
+                        <span id="rowCount" class="info-value"></span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Columns:</span>
+                        <span id="columnCount" class="info-value"></span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card controls-section" id="controlsSection" style="display: none;">
+                <h2 class="card-title">Visualization Settings</h2>
+
+                <div class="control-grid basic-grid">
+                    <div class="control-group">
+                        <label class="control-label">Chart Type</label>
+                        <select id="chartType" class="control-input">
+                            <optgroup label="Basic Charts">
+                                <option value="bar">Bar Chart</option>
+                                <option value="line">Line Chart</option>
+                                <option value="area">Area Chart</option>
+                                <option value="pie">Pie Chart</option>
+                            </optgroup>
+                            <optgroup label="Statistical Charts">
+                                <option value="scatter">Scatter Plot</option>
+                                <option value="bubble">Bubble Chart</option>
+                                <option value="histogram">Histogram</option>
+                                <option value="box">Box Plot</option>
+                                <option value="violin">Violin Plot</option>
+                            </optgroup>
+                            <optgroup label="Advanced Charts">
+                                <option value="heatmap">Heatmap</option>
+                                <option value="sunburst">Sunburst</option>
+                                <option value="treemap">Treemap</option>
+                            </optgroup>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">X-Axis</label>
+                        <select id="xColumn" class="control-input">
+                            <option value="">Select column...</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">Y-Axis</label>
+                        <select id="yColumn" class="control-input">
+                            <option value="">Select column...</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">Chart Title</label>
+                        <input type="text" id="chartTitle" class="control-input" placeholder="Enter title...">
+                    </div>
+                </div>
+
+                <details class="advanced-panel">
+                    <summary>Advanced Options</summary>
+                    <div class="control-grid advanced-grid">
+                        <div class="control-group" id="zColumnGroup" style="display: none;">
+                            <label class="control-label">Z-Axis</label>
+                            <select id="zColumn" class="control-input">
+                                <option value="">Select column...</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group">
+                            <label class="control-label">Color By</label>
+                            <select id="colorColumn" class="control-input">
+                                <option value="">None</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group" id="aggregationGroup">
+                            <label class="control-label">Aggregation</label>
+                            <select id="aggregation" class="control-input">
+                                <option value="sum">Sum</option>
+                                <option value="mean">Mean</option>
+                                <option value="median">Median</option>
+                                <option value="count">Count</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group" id="autoScaleGroup">
+                            <label class="control-label">Y-Axis Scale</label>
+                            <label class="toggle-control" for="autoScaleY">
+                                <input type="checkbox" id="autoScaleY" checked>
+                                <span>Auto-scale near-equal values</span>
+                            </label>
+                        </div>
+                    </div>
+                </details>
+
+                <div class="button-group">
+                    <button id="createVisualization" class="btn btn-primary btn-main">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                            <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                        </svg>
+                        Create Visualization
+                    </button>
+                    <button id="analyzeData" class="btn btn-secondary">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                        Analyze Data
+                    </button>
+                </div>
+                <div id="actionStatus" class="action-status" aria-live="polite"></div>
+
+                <div class="dashboard-tools">
+                    <h3 class="tools-title">Dashboards & Export</h3>
+                    <div class="tools-grid">
+                        <div class="control-group">
+                            <label class="control-label">Dashboard Name</label>
+                            <input type="text" id="dashboardName" class="control-input" placeholder="e.g. Monthly Sales View">
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label">Saved Dashboards</label>
+                            <select id="savedDashboards" class="control-input">
+                                <option value="">No saved dashboards</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="dashboardPreview" class="dashboard-preview">Select a saved dashboard to preview its configuration.</div>
+                    <div class="button-group dashboard-actions">
+                        <button id="saveDashboard" class="btn btn-secondary">Save Dashboard</button>
+                        <button id="loadDashboard" class="btn btn-secondary">Load Dashboard</button>
+                        <button id="deleteDashboard" class="btn btn-secondary">Delete Dashboard</button>
+                        <button id="exportPng" class="btn btn-primary">Export PNG</button>
+                        <button id="exportSvg" class="btn btn-primary">Export SVG</button>
+                        <button id="exportHtml" class="btn btn-primary">Export HTML</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card visualization-section" id="visualizationSection" style="display: none;">
+                <h2 class="card-title">Visualization</h2>
+                <div class="plot-wrapper">
+                    <div id="plotDiv"></div>
+                </div>
+            </section>
+
+            <section class="card analysis-section" id="analysisSection" style="display: none;">
+                <h2 class="card-title">Data Analysis</h2>
+                <div id="analysisContent" class="analysis-content"></div>
+            </section>
+        </div>
+
+        <div id="loadingOverlay" class="loading-overlay" style="display: none;">
+            <div class="spinner"></div>
+            <p class="loading-text">Processing...</p>
+        </div>
+
+        <div id="toast" class="toast"></div>
+    </div>
+
+    <script src="./config.js"></script>
+    <script src="./static/js/app.js?v=3.0"></script>
+</body>
+</html>
